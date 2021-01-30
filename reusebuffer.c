@@ -12,22 +12,22 @@
 void print(int start);
 
 int main(void) {
-	int i;
-	for (i = 1; i < LIMIT - 15; i += 15) {
-	    print(i);
-	}
-	while (i <= LIMIT) {
-		if (i % 3 == 0) {
-			printf("Fizz\n");
-		} else if (i % 5 == 0) {
-			printf("Buzz\n");
-		} else {
-			printf("%d\n", i);
-		}
-		i++;
-	}
+    int i;
+    for (i = 1; i < LIMIT - 15; i += 15) {
+        print(i);
+    }
+    while (i <= LIMIT) {
+        if (i % 3 == 0) {
+            printf("Fizz\n");
+        } else if (i % 5 == 0) {
+            printf("Buzz\n");
+        } else {
+            printf("%d\n", i);
+        }
+        i++;
+    }
 
-	return 0;
+    return 0;
 }
 
 // return number of decimal digits within the number, write decimal number to supplied buffer, right-aligned
@@ -129,4 +129,3 @@ void print(int num) {
 
     fwrite(wrkbuf, buf_len, 1, stdout);
 }
-

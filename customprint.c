@@ -8,22 +8,22 @@
 void print(int start);
 
 int main(void) {
-	int i;
-	for (i = 1; i < LIMIT - 15; i += 15) {
-	    print(i);
-	}
-	while (i <= LIMIT) {
-		if (i % 3 == 0) {
-			printf("Fizz\n");
-		} else if (i % 5 == 0) {
-			printf("Buzz\n");
-		} else {
-			printf("%d\n", i);
-		}
-		i++;
-	}
+    int i;
+    for (i = 1; i < LIMIT - 15; i += 15) {
+        print(i);
+    }
+    while (i <= LIMIT) {
+        if (i % 3 == 0) {
+            printf("Fizz\n");
+        } else if (i % 5 == 0) {
+            printf("Buzz\n");
+        } else {
+            printf("%d\n", i);
+        }
+        i++;
+    }
 
-	return 0;
+    return 0;
 }
 
 // don't use itoa() because it is non-standard and more generic
@@ -68,4 +68,3 @@ void print(int num) {
     FIZZBUZZ;
     fwrite(wrkbuf, cur - wrkbuf, 1, stdout);
 }
-

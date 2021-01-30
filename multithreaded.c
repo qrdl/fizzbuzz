@@ -29,7 +29,7 @@ void *worker(void *arg);
 int process_chunk(int num, int *pos, char *wrkbuf, int wrkbuf_size, int *digit_num);
 
 int main(void) {
-	int i = 1;
+    int i = 1;
     // start all workers
     for (int j = 0; j < THREAD_COUNT; j++) {
         thread_pool[j].start_num = i;
@@ -63,18 +63,18 @@ int main(void) {
     } 
 
     // process tail
-	while (i <= LIMIT) {
-		if (i % 3 == 0) {
-			printf("Fizz\n");
-		} else if (i % 5 == 0) {
-			printf("Buzz\n");
-		} else {
-			printf("%d\n", i);
-		}
-		i++;
-	}
+    while (i <= LIMIT) {
+        if (i % 3 == 0) {
+            printf("Fizz\n");
+        } else if (i % 5 == 0) {
+            printf("Buzz\n");
+        } else {
+            printf("%d\n", i);
+        }
+        i++;
+    }
 
-	return 0;
+    return 0;
 }
 
 
@@ -192,4 +192,3 @@ int process_chunk(int num, int *pos, char *wrkbuf, int wrkbuf_width, int *digit_
 
     return wrkbuf_width;     // not changed
 }
-

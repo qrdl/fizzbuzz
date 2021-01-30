@@ -9,13 +9,13 @@ The least efficient implementation, with 3 *if*s and two *printf*s per number. I
 A little bit optimised version, with 2 *if*s (not counting the loop condition) and 1 *printf* per number.
 
 ### unrolled
-Single loop iteration for 15 numbers, it means for 15 numbers just one condition (vs 45 conditions for naive) and 1 *printf* (vs 15 *printf*s for naive).
+Single loop iteration for 15 numbers, it means for 15 numbers just one branch (vs 45 branches for naive) and 1 *printf* (vs 15 *printf*s for naive).
 
 ### customprint
 Generic *printf* replaced with custom print routine, tailored for this particular task.
 
 ### reusebuf
-Reuse buffer from previous iteration, update only the changed characters
+Reuse buffer from previous iteration, update only the changed characters. Use x86_64 vector instructions for comparing buffers.
 
 ### multithreaded
 Use worker threads to process the sets of numbers in parallel.
@@ -28,7 +28,7 @@ Output redirected to /dev/null. Multithreaded implementation uses 4 worker threa
 Implementation | Time (min:sec.millisec) | Relative to naive | Relative to previous
 -|-|-|-
 supernaive | 1:21.310 | 0.49 |
-naive | 39.650 | | 2.05
+naive | 39.650 | 1 | 2.05
 unrolled | 20.151 | 1.97 | 1.97
 customprint | 8.771 | 4.52 | 2.30
 reusebuf | 4.490 | 8.83 | 1.95
