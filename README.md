@@ -28,7 +28,7 @@ Output redirected to /dev/null. Multithreaded implementation uses 4 worker threa
 Implementation | Time (min:sec.millisec) | Relative to naive | Relative to previous
 -|-|-|-
 supernaive | 1:21.310 | 0.49 |
-naive | 39.650 | | 2.05
+naive | 39.650 | 1 | 2.05
 unrolled | 20.151 | 1.97 | 1.97
 customprint | 8.771 | 4.52 | 2.30
 reusebuf | 4.490 | 8.83 | 1.95
