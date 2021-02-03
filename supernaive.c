@@ -10,7 +10,7 @@ int main(void) {
         if (0 == i % 5) {
             printf("Buzz");
         }
-        if (i % 3 || i % 5) {
+        if (i % 3 && i % 5) {
             printf("%d", i);
         }
         printf("\n");
