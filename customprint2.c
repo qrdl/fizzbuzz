@@ -27,7 +27,7 @@ int main(void) {
 }
 
 // don't use itoa() because it is non-standard and more generic
-static char *myitoa(int number, char *cur) {
+char *myitoa(int number, char *cur) {
     do {
         *--cur = number % 10 + '0';
         number /= 10;
@@ -35,19 +35,27 @@ static char *myitoa(int number, char *cur) {
     return cur;
 }
 
-static void print(int num) {
+void print(int num) {
     static char wrkbuf[CHUNK_SIZE] = {
         [CHUNK_SIZE - 10] = '\n', 'F', 'i', 'z', 'z', 'B', 'u', 'z', 'z', '\n'
     };
 
     char *cur = wrkbuf + CHUNK_SIZE - 10;
-    cur = myitoa(num + 13, cur) -  1; *cur = '\n';
-    cur = myitoa(num + 12, cur) -  6; memcpy(cur, "\nFizz\n"      ,  6);
-    cur = myitoa(num + 10, cur) - 11; memcpy(cur, "\nFizz\nBuzz\n", 11);
-    cur = myitoa(num +  7, cur) -  1; *cur = '\n';
-    cur = myitoa(num +  6, cur) - 11; memcpy(cur, "\nBuzz\nFizz\n", 11);
-    cur = myitoa(num +  3, cur) -  6; memcpy(cur, "\nFizz\n"      ,  6);
-    cur = myitoa(num +  1, cur) -  1; *cur = '\n';
-    cur = myitoa(num +  0, cur);
+    cur = myitoa(num + 13, cur) - 1;    // 14
+    *cur = '\n';                        // 13
+    cur = myitoa(num + 12, cur) - 6;
+    memcpy(cur, "\nFizz\n", 6);         // 12
+    cur = myitoa(num + 10, cur) - 11;   // 11
+    memcpy(cur, "\nFizz\nBuzz\n", 11);  // 9, 10
+    cur = myitoa(num + 7, cur) - 1;     // 8
+    *cur = '\n';                        // 7
+    cur = myitoa(num + 6, cur) - 11;
+    memcpy(cur, "\nBuzz\nFizz\n", 11);  // 5, 6
+    cur = myitoa(num + 3, cur) - 6;     // 4
+    memcpy(cur, "\nFizz\n", 6);         // 3
+    cur = myitoa(num + 1, cur) - 1;     // 2
+    *cur = '\n';                        // 1
+    cur = myitoa(num + 0, cur);
+
     fwrite(cur, wrkbuf + CHUNK_SIZE - cur, 1, stdout);
 }

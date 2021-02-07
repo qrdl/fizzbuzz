@@ -65,7 +65,8 @@ void print(int num) {
     char last_number[NUMBERSIZE] = {0};
     int digit_count = myitoa(num+14, last_number);
 
-    if (digit_num != digit_count) {
+    // numbers add extra digit only 8 times during the whole execution, so this branch is unlikely
+    if (__builtin_expect(digit_num != digit_count, 0)) {
         // there are more digits in the number - create buffer from the scratch
         char number[NUMBERSIZE+1];  // one extra for newline
         number[NUMBERSIZE] = '\n';
