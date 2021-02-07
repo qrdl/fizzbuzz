@@ -2,7 +2,7 @@ CFLAGS := -O3 -march=native -pthread
 
 .PHONY : all clean
 
-BINS = supernaive naive unrolled customprint reusebuffer multithreaded
+BINS = supernaive naive unrolled customprint customprint2 reusebuffer multithreaded
 
 all: $(BINS)
 
