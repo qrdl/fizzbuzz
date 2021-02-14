@@ -24,7 +24,7 @@ Reuse buffer from previous iteration, update only the changed characters. Use x8
 Reuse buffer from previous iteration, update only the changed characters. Use x86_64 vector instructions for comparing buffers. Fill buffer in reverse to reduce number of *memcpy* calls. Courtesy of [kariya-mitsuru](https://github.com/kariya-mitsuru).
 
 ### multithreaded
-Use worker threads to process the sets of numbers in parallel.
+Use worker threads to process the sets of numbers in parallel. Buffer is filled in reverse, like in reusebuf2.
 
 ## Comparison
 
@@ -41,4 +41,4 @@ customprint | 8.771 | 4.52 | 2.30
 customprint2 | 6.695 | 5.92 | 1.31
 reusebuf | 4.490 | 8.83 | 1.49
 reusebuf2 | 2.818 | 14.07 | 1.59
-multithreaded | 1.748 | 22.68 | 1.61
+multithreaded | 1.051 | 37.73 | 2.68

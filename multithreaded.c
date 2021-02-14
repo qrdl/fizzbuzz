@@ -26,7 +26,7 @@ struct thread_data {
 struct thread_data thread_pool[THREAD_COUNT];
 
 void *worker(void *arg);
-int process_chunk(int num, int *pos, char *wrkbuf, int wrkbuf_size, int *digit_num);
+int process_chunk(int num, char *pos[8], char *wrkbuf, int wrkbuf_width, int *digit_num);
 
 int main(void) {
     int i = 1;
@@ -60,7 +60,7 @@ int main(void) {
             free(thread_pool[j].buf);
             active_threads--;
         }
-    } 
+    }
 
     // process tail
     while (i <= LIMIT) {
@@ -80,16 +80,19 @@ int main(void) {
 
 // worker thread
 void *worker(void *arg) {
-    int pos[15];
-    char wrkbuf[CHUNK_SIZE];
+    char wrkbuf[CHUNK_SIZE] = {
+        [CHUNK_SIZE - 10] = '\n', 'F', 'i', 'z', 'z', 'B', 'u', 'z', 'z', '\n'
+    };
+    char *pos[8];           // past the end positions of numbers within the buffer
+    int buf_len = 0;        // output length
+    int digit_num = 0;      // number of digits within the number
     int wrkbuf_width = 0;   // how many bytes of wrkbuf are actually used
-    int digit_num = 0;   // number of digits within the number
+
     struct thread_data *data = (struct thread_data *)arg;
-    int buf_len = 0;
 
     for (int i = data->start_num; i < data->start_num + data->count; i += 15) {
         wrkbuf_width = process_chunk(i, pos, wrkbuf, wrkbuf_width, &digit_num);
-        memcpy(data->buf + buf_len, wrkbuf, wrkbuf_width);
+        memcpy(data->buf + buf_len, wrkbuf + CHUNK_SIZE - wrkbuf_width, wrkbuf_width);
         buf_len += wrkbuf_width;
     }
     data->buflen = buf_len;
@@ -98,97 +101,86 @@ void *worker(void *arg) {
 }
 
 
-// return number of decimal digits within the number, write decimal number to supplied buffer, right-aligned
-int myitoa(int number, char buf[NUMBERSIZE]) {
-    char *cur = buf+NUMBERSIZE;
-    int i = 0;
-    for (; number > 0; i++) {
-        cur--;
-        int tmp = number % 10;
+// don't use itoa() because it is non-standard and more generic
+static char *myitoa(int number, char *cur) {
+    do {
+        *--cur = number % 10 + '0';
         number /= 10;
-        *cur = tmp + '0';
-    }
-    return i;
+    } while (number != 0);
+    return cur;
 }
 
+static void myitoa_diff(int number, char *cur, int diff_len) {
+    char *end = cur - diff_len;
+    do {
+        *--cur = number % 10 + '0';
+        number /= 10;
+    } while (cur > end);
+}
 
-#define NUM do { int tmp = myitoa(num++, number); memcpy(cur, number+NUMBERSIZE-tmp, tmp+1); cur += tmp+1; } while (0)
-#define FIZZ do { memcpy(cur, "Fizz\n", 5); cur += 5; num++; } while (0)
-#define BUZZ do { memcpy(cur, "Buzz\n", 5); cur += 5; num++; } while (0)
-#define FIZZBUZZ do { memcpy(cur, "FizzBuzz\n", 9); cur += 9; } while (0)
-#define PROCNUM(I) do { \
-        int cur = num+I-1; \
-        for (int i = pos[I-1] + *digit_num - 1; i >= (int)(pos[I-1] + *digit_num - diff_pos); i--) { \
-            wrkbuf[i] = (cur % 10) + '0'; \
-            cur /= 10; \
-        } \
-} while (0)
-
-int process_chunk(int num, int *pos, char *wrkbuf, int wrkbuf_width, int *digit_num) {
-    char last_number[NUMBERSIZE] = {0};
-    int digit_count = myitoa(num+14, last_number);  // count of decimal digits in the last number in the chunk of 15
-
-    if (*digit_num != digit_count) {
-        // there are more digits in the number - fill buffer from the scratch
-        char number[NUMBERSIZE+1];  // one extra for newline
-        number[NUMBERSIZE] = '\n';
-        char *cur = wrkbuf;
-        pos[0] = 0;
-        NUM;
-        if (cur - wrkbuf - 1 == digit_count) {
-            *digit_num = digit_count;
+static char *myitoa14(int number, char *cur, char *old) {
+    *--cur = number % 10 + '0';
+    number /= 10;
+    *--cur = number % 10 + '0';
+    for (;;) {
+        number /= 10;
+        if (number == 0) {
+            return cur;
         }
-        pos[1] = cur - wrkbuf;
-        NUM;
-        pos[2] = cur - wrkbuf;
-        FIZZ;
-        pos[3] = cur - wrkbuf;
-        NUM;
-        pos[4] = cur - wrkbuf;
-        BUZZ;
-        pos[5] = cur - wrkbuf;
-        FIZZ;
-        pos[6] = cur - wrkbuf;
-        NUM;
-        pos[7] = cur - wrkbuf;
-        NUM;
-        pos[8] = cur - wrkbuf;
-        FIZZ;
-        pos[9] = cur - wrkbuf;
-        BUZZ;
-        pos[10] = cur - wrkbuf;
-        NUM;
-        pos[11] = cur - wrkbuf;
-        FIZZ;
-        pos[12] = cur - wrkbuf;
-        NUM;
-        pos[13] = cur - wrkbuf;
-        NUM;
-        pos[14] = cur - wrkbuf;
-        FIZZBUZZ;
-        return cur - wrkbuf;    // return new used width of work buffer
+        char digit = number % 10 + '0';
+        if (*--cur == digit) {
+            return old;
+        }
+        *cur = digit;
+    }
+}
+
+int process_chunk(int num, char *pos[8], char *wrkbuf, int wrkbuf_width, int *digit_num) {
+    // always output num + 13 to check number of digits
+    char *cur = myitoa14(num + 13, wrkbuf + CHUNK_SIZE - 10, pos[7]);    // 14
+
+    if (*digit_num != wrkbuf + CHUNK_SIZE - 10 - cur) {
+        // there are more digits in the number - create buffer from the scratch
+        pos[7] = cur;
+        *--cur = '\n';                      // 13
+        cur = myitoa(num + 12, cur) - 6;
+        memcpy(cur, "\nFizz\n", 6);         // 12
+        pos[6] = cur;                       // 11
+        cur = myitoa(num + 10, cur) - 11;
+        memcpy(cur, "\nFizz\nBuzz\n", 11);  // 9, 10
+        pos[5] = cur;                       // 8
+        cur = myitoa(num + 7, cur) - 1;
+        *cur = '\n';                        // 7
+        pos[4] = cur;
+        cur = myitoa(num + 6, cur) - 11;
+        memcpy(cur, "\nBuzz\nFizz\n", 11);  // 5, 6
+        pos[3] = cur;                       // 4
+        cur = myitoa(num + 3, cur) - 6;
+        memcpy(cur, "\nFizz\n", 6);         // 3
+        pos[2] = cur;                       // 2
+        cur = myitoa(num + 1, cur) - 1;
+        *cur = '\n';                        // 1
+        pos[1] = cur;
+        cur = myitoa(num + 0, cur);
+        pos[0] = cur;
+        *digit_num = pos[1] - cur;
+        return wrkbuf + CHUNK_SIZE - cur;
     }
 
-    // for comparison use first number from current working buffer
-    char prev_first_number[NUMBERSIZE] = {0};
-    int num_width = pos[1] - 1;
-    memcpy(prev_first_number + NUMBERSIZE - num_width, wrkbuf, num_width);
-
-    // find out how many digits actually changed - use SSE2 vector instructions for comparing 16-byte buffers
-    unsigned int diff = 0xFFFF & ~_mm_movemask_epi8(_mm_cmpeq_epi8(
-                                                    _mm_load_si128((__m128i const *)prev_first_number),
-                                                    _mm_load_si128((__m128i const *)last_number)));
+    // find out how many digits actually changed - use SSE2 instruction for comparing 8-byte buffers
+    unsigned int diff = ~_mm_movemask_epi8(_mm_cmpeq_epi8(
+                                            _mm_loadl_epi64((__m128i const *)pos[0]),
+                                            _mm_loadl_epi64((__m128i const *)cur)));
     // lower zero bits indicate unchanged bytes
-    unsigned int diff_pos = 16 - _tzcnt_u32(diff);   // number of changed digits
+    unsigned int diff_len = *digit_num - _tzcnt_u32(diff);   // number of changed digits
 
-    PROCNUM(1);
-    PROCNUM(2);
-    PROCNUM(4);
-    PROCNUM(7);
-    PROCNUM(8);
-    PROCNUM(11);
-    PROCNUM(13);
-    PROCNUM(14);
+    myitoa_diff(num + 12, cur - 1, diff_len);   // 13
+    myitoa_diff(num + 10, pos[6] , diff_len);   // 11
+    myitoa_diff(num +  7, pos[5] , diff_len);   // 8
+    myitoa_diff(num +  6, pos[4] , diff_len);   // 7
+    myitoa_diff(num +  3, pos[3] , diff_len);   // 4
+    myitoa_diff(num +  1, pos[2] , diff_len);   // 2
+    myitoa_diff(num +  0, pos[1] , diff_len);   // 1
 
     return wrkbuf_width;     // not changed
 }
