@@ -29,10 +29,10 @@ All tests are performed on Dell Latitude 7480 with Core i7-7600U (2 cores with h
 
 Output redirected to /dev/null. Multithreaded implementation uses 4 worker threads, with load of 3M number per thread.
 
-Implementation | Time (min:sec.millisec) | Relative to naive | Relative to previous
+Implementation | Time (sec.millisec) | Relative to naive | Relative to previous
 -|-|-|-
-supernaive | 1:21.310 | 0.49 |
-naive | 39.650 | 1 | 2.05
+supernaive | 49.661 | 0.80 |
+naive | 39.650 | 1 | 1.25
 unrolled | 20.151 | 1.97 | 1.97
 customprint | 8.771 | 4.52 | 2.30
 customprint2 | 6.695 | 5.92 | 1.31
