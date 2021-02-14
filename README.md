@@ -15,10 +15,13 @@ Single loop iteration for 15 numbers, it means for 15 numbers just one branch (v
 Generic *printf* replaced with custom print routine, tailored for this particular task.
 
 ### customprint2
-Like *customprint*, but buffer is filled in reverse, and adjacent *Fizz* and *Buzz* words are merged into single *memcpy*, as a result number of *memcpy* calls per iteration goes down from 15 to just 4.
+Like *customprint*, but buffer is filled in reverse, and adjacent *Fizz* and *Buzz* words are merged into single *memcpy*, as a result number of *memcpy* calls per iteration goes down from 15 to just 4. Courtesy of [kariya-mitsuru](https://github.com/kariya-mitsuru).
 
 ### reusebuf
 Reuse buffer from previous iteration, update only the changed characters. Use x86_64 vector instructions for comparing buffers.
+
+### reusebuf2
+Reuse buffer from previous iteration, update only the changed characters. Use x86_64 vector instructions for comparing buffers. Fill buffer in reverse to reduce number of *memcpy* calls. Courtesy of [kariya-mitsuru](https://github.com/kariya-mitsuru).
 
 ### multithreaded
 Use worker threads to process the sets of numbers in parallel.
@@ -37,4 +40,5 @@ unrolled | 20.151 | 1.97 | 1.97
 customprint | 8.771 | 4.52 | 2.30
 customprint2 | 6.695 | 5.92 | 1.31
 reusebuf | 4.490 | 8.83 | 1.49
-multithreaded | 1.748 | 22.68 | 2.57
+reusebuf2 | 2.818 | 14.07 | 1.59
+multithreaded | 1.748 | 22.68 | 1.61
