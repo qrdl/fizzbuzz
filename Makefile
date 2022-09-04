@@ -1,10 +1,8 @@
-CFLAGS := -O3 -march=native -pthread
+CFLAGS := -O3 -march=native -pthread -fwhole-program
 
 .PHONY : all clean
 
-BINS = supernaive naive unrolled customprint customprint2 reusebuffer reusebuffer2 multithreaded multithreaded2
-
-multithreaded2: multithreaded2.c lookup.h
+BINS = supernaive naive unrolled customprint customprint2 reusebuffer reusebuffer2 multithreaded multithreaded2 multithreaded3
 
 all: $(BINS)
 

@@ -29,6 +29,10 @@ Uses worker threads to process the sets of numbers in parallel. Buffer is filled
 ### multithreaded2
 Doesn't use intrinsics, but uses lookup table for converting numbers to strings.
 
+### multithreaded3
+Like multithreaded2, but uses better thread management, smaller chunks, and reuses the buffer in a fastest worker.
+
+
 ## Comparison
 
 All tests are performed on Dell Latitude 7480 with Core i7-7600U (2 cores with hyperthreading) and 16 Gb RAM, Linux kernel 5.17.0, glibc 2.31. All tests compiled with gcc 11.3.0.
@@ -46,4 +50,4 @@ reusebuf | 4.659 | 7.83 | 1.22
 reusebuf2 | 3.203 | 11.40 | 1.45
 multithreaded | 0.892 | 40.92 | 3.29
 multithreaded2 | 0.692 | 52.74 | 1.29
-
+multithreaded3 | 0.226 | 161.5 | 3.06
